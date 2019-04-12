@@ -8,6 +8,7 @@ using Improbable.Gdk.PlayerLifecycle;
 using Improbable.Gdk.StandardTypes;
 using Improbable.PlayerLifecycle;
 using UnityEngine;
+using Pickups;
 
 namespace Fps
 {
@@ -103,5 +104,22 @@ namespace Fps
 
             return template;
         }
+
+        public static EntityTemplate HealthPickup(Vector3f position, uint healthValue)
+        {
+            // Create a HealthPickup component snapshot which is initially active and grants "heathValue" on pickup.
+            var healthPickupComponent = new Pickups.HealthPickup.Snapshot(true, healthValue);
+ 
+            var entityTemplate = new EntityTemplate();
+            entityTemplate.AddComponent(new Position.Snapshot(new Coordinates(position.X, position.Y, position.Z)), WorkerUtils.UnityGameLogic);
+            entityTemplate.AddComponent(new Metadata.Snapshot("HealthPickup"), WorkerUtils.UnityGameLogic);
+            entityTemplate.AddComponent(new Persistence.Snapshot(), WorkerUtils.UnityGameLogic);
+            entityTemplate.AddComponent(healthPickupComponent, WorkerUtils.UnityGameLogic);
+            entityTemplate.SetReadAccess(WorkerUtils.UnityGameLogic, WorkerUtils.UnityClient);
+            entityTemplate.SetComponentWriteAccess(EntityAcl.ComponentId, WorkerUtils.UnityGameLogic);
+ 
+            return entityTemplate;
+        }
     }
+
 }
